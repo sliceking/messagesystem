@@ -20,9 +20,49 @@ class MessagesController extends Controller
     return view('home')->with('messages', $messages);
   }
 
-  public function create()
+  public function create(int $id = 0, string $subject = '')
   {
-    $users = User::where('id', '!=', Auth::id())->get();
-    return view('create')->with('users', $users);
+    if ($id === 0){
+      $users = User::where('id', '!=', Auth::id())->get();
+    }
+    else {
+      $users = User::where('id', $id)->get();
+    }
+
+    if ($subject !== '') $subject = 'Re: ' . $subject;
+
+    return view('create')->with(['users' => $users, 'subject' => $subject]);
+  }
+
+  public function send(Request $request)
+  {
+    $this->validate($request, [
+      'subject' => 'required',
+      'message' => 'required',
+    ]);
+
+    $message = new Message;
+    $message->user_id_from = Auth::id();
+    $message->user_id_to = $request->input('to');
+    $message->subject = $request->input('subject');
+    $message->body = $request->input('message');
+    $message->save();
+
+    return redirect()->to('/home')->with('status', 'Message was sent successfully');
+  }
+
+  public function sent()
+  {
+    $messages = Message::where('user_id_from', Auth::id())
+      ->orderBy('created_at', 'desc')->get();
+    return view('sent')->with('messages', $messages);
+  }
+
+  public function read($id)
+  {
+    $message = Message::with('userFrom')->find($id);
+    $message->read = true;
+    $message->save();
+    return view('read')->with('message', $message);
   }
 }

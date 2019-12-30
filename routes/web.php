@@ -11,11 +11,12 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'MessagesController@index');
 
 Auth::routes();
 
 Route::get('/home', 'MessagesController@index')->name('home');
-Route::get('/create', 'MessagesController@create')->name('create');
+Route::get('/create/{id?}/{subject?}', 'MessagesController@create')->name('create');
+Route::post('/send', 'MessagesController@send')->name('send');
+Route::get('/sent', 'MessagesController@sent')->name('sent-messages');
+Route::get('/read/{id}', 'MessagesController@read')->name('read');
