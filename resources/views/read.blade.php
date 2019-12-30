@@ -11,4 +11,5 @@
   Message: {{ $message->body }}
   <hr>
   <a href="{{ route('create', [$message->userFrom->id, $message->subject]) }}" class="btn btn-primary">Reply</a>
+  <a href="{{ route('delete', $message->id) }}" class="btn btn-danger float-right">Delete</a>
 @endsection
